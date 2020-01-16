@@ -1,7 +1,8 @@
-To use this demo:
+In addition to creation of separate JavaScript modules, it's possible to use the rollup.js bundler under node.js to create monoliths.
 
-- Install node.js from https://nodejs.org
-- Compile the demo with transcrypt -b -p. nodejs_demo.py
-- In a node.js command prompt, go to the __javascript__ subdirectory
-- Type node nodejs_demo.js (or node nodejs_demo.min.js if you want to run the minified version)
-- Quirk in Google Chrome: If you hit refresh, the log shows that a page may actually be loaded twice...
+For this example, after running Transcrypt, go to the __target__ directory and type:
+
+rollup hello.js --o hello_bundle.js --f iife --name 'hello'
+
+It will create a standalone browser application of only 27 kB.
+Run this application loading hello_bundle.html into your browser.

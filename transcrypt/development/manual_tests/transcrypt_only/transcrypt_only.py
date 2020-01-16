@@ -54,11 +54,7 @@ example = __new__ (Example ())
 example.foo (1, 2, 3)   # Correct for JavaScript 5 and up
 example.foo (*args)     # For JavaScript < 6 this is transcribed to example.foo.call (null, args), "foo" context is lost
 
-__pragma__ ('ifdef', '__esv6__')
 output ('[object Object] rather than null in previous line')
-__pragma__ ('else')
-output ('None rather than [object Object] in previous line')
-__pragma__ ('endif')
 
 output ('<br>Issue 130')    # Add pragma to optionally handle % the JS way
 

@@ -79,14 +79,9 @@ def getZValues (xGrid, yGrid):
     ]
 
 kind = 'wireframe'
-
-__pragma__ ('ifdef', '__esv6__')
-
 document.getElementById (kind) .innerHTML = 'Plotly {} not yet functional for JS6'.format (kind)
 
-__pragma__ ('else')
-
-type = 'scatter3d'
+aType = 'scatter3d'
 Plotly.plot (
     kind,
     itertools.chain (
@@ -95,7 +90,7 @@ Plotly.plot (
                 x: denseGrid,
                 y: [sparseGrid [i] for value in denseGrid],
                 z: getZValues (denseGrid, sparseGrid) [i],
-                type: type,
+                type: aType,
                 mode: 'lines',
                 line: {color:'rgb(0,0,255)'},
                 zmin: -0.2,
@@ -109,7 +104,7 @@ Plotly.plot (
                 x: [sparseGrid [i] for value in denseGrid],
                 y: denseGrid,
                 z: zip (*getZValues (sparseGrid, denseGrid)) [i],   # Poor man's transpose to avoid dependency of demo on Numscrypt
-                type: type,
+                type: aType,
                 mode: 'lines',
                 line: {color:'rgb(0,0,255)'},
                 zmin: -0.2,
@@ -123,8 +118,6 @@ Plotly.plot (
         showlegend: False
     }
 )
-
-__pragma__ ('endif')
 
 kind = 'ribbon'
 Plotly.plot (

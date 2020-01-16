@@ -1,22 +1,23 @@
+# ====== File extensions anywhere
 *.nogit
 *.pyc
 *.npp
+*.log
 *.egg-info/
-**.__pycache__/
+*.min.html/
+.DS_Store
+
+# ======= Directories anywhere
+__target__/
+__javascript__/
+__pycache__/
+.mypy_cache/
 dist/
+node_modules/
+
+# ======== Directories at specific locations
 transcrypt/docs/sphinx/_build/
 transcrypt/development/attic/
 transcrypt/development/docs/
 transcrypt/development/experiments/
 transcrypt/development/automated_tests/*/autotest.html
-transcrypt/development/automated_tests/*/autotest.min.html
-transcrypt/development/automated_tests/**/__javascript__/
-transcrypt/modules/re/__javascript__/
-transcrypt/modules/time/__javascript__/
-transcrypt/modules/math/__javascript__/
-transcrypt/modules/cmath/__javascript__/
-transcrypt/modules/logging/__javascript__/
-transcrypt/modules/warnings/__javascript__/
-transcrypt/modules/org/transcrypt/autotester/__javascript__/
-transcrypt/modules/org/transcrypt/__javascript__/__base__.mod.js
-transcrypt/modules/org/transcrypt/__javascript__/__standard__.mod.js

@@ -20,30 +20,47 @@ import traceback
 import site
 import atexit
 import webbrowser
+import tokenize
 
-programDir = os.getcwd () .replace ('\\', '/')
-transpilerDir = os.path.dirname (os.path.abspath (__file__)) .replace ('\\', '/')
-    
-modulesDir = '{}/modules'.format (transpilerDir)
+transpilerDir = os.path.dirname (os.path.abspath (__file__)) .replace ('\\', '/')   # Set of Transcrypt itself
+modulesDir = '{}/modules'.format (transpilerDir)                                    # Set dir of Transcrypt-only modules
 
-# Both CPython and Transcrypt will use all dirs in sys.path as search roots for modules
+# Both CPython and Transcrypt will use dirs in sys.path as search roots for modules
 # CPython will also search relatively from each module, Transcrypt only from the main module
-
+# Use / rather than \ pervasively
 sys.path = [item.replace ('\\', '/') for item in sys.path]
-compilerPath = [programDir, modulesDir] + sys.path  # Used by Transcrypt rather than CPython, programDir isn't always part of the path under Linux
 
+'''
+# Leave out Transcrypt dir to prevent importing modules root if there's a module by that name
+# This is needed for CPython and it won't hurt for Transcrypt 
 try:
-    sys.path.remove (transpilerDir)                     # Used by CPython, leave out Transcrypt dir to prevent importing modules root if there's a module by that name
+    sys.path.remove (transpilerDir)
 except:
     pass
-                                                    
-sys.path += [modulesDir]
-sys.modules.pop ('org', None)                       # Unload org from a packages dir, if it's there.
+'''
 
-from org.transcrypt import __base__                 # May reload org from a packages dir (or load org from different location)
+# Unload org from a packages dir, if it happens to be there in the CPython installation
+sys.modules.pop ('org', None)   
+
+# Transcrypt needs to find modulesDir before CPython modules, so it will favor Transcrypt modules
+candidateTranspilationDirs = [modulesDir] + sys.path
+lowerSkipExtensions = ('.zip', '/dlls', '/lib', '/python37')    # !!! Generalize to all platforms and Python versions
+
+transpilationDirs = []
+for candidateTranspilationDir in candidateTranspilationDirs:
+    # print ('DEBUG', candidateTranspilationDir)
+    for lowerSkipExtension in lowerSkipExtensions:
+        if candidateTranspilationDir.lower () .endswith (lowerSkipExtension):
+            break
+    else:
+        transpilationDirs.append (candidateTranspilationDir)
+
+# The following imports are need by Transcrypt itself, not by transpiled or executed user code
+# The following imports will either reload the previously unloaded org or load org from different location
+# CPython needs to find modulesDir after CPython modules, so it will favor CPython modules
+sys.path.append (modulesDir)      
 from org.transcrypt import utils
 from org.transcrypt import compiler
-
 exitCodeNames = ('exitSuccess', 'exitCommandArgsError', 'exitNoLicense', 'exitSourceNotGiven', 'exitCannotRunSource', 'exitSpecificCompileError', 'exitGeneralCompileError')
 
 for exitCode, exitCodeName in enumerate (exitCodeNames):
@@ -54,9 +71,9 @@ def main ():
 
     def exitHandler ():
         if exitCode == exitSuccess:
-            utils.log (True, '\nReady\n')       
+            utils.log (True, '\nReady\n\n')       
         else:
-            utils.log (True, '\nAborted\n')
+            utils.log (True, '\nAborted\n\n')
             
     atexit.register (exitHandler)
     
@@ -66,15 +83,20 @@ def main ():
         return exitCode
     
     try:
+        __envir__ = utils.Any ()
+        with tokenize.open (f'{modulesDir}/org/transcrypt/__envir__.js') as envirFile:
+            exec (envirFile.read ());
+        __envir__.executor_name = __envir__.interpreter_name
+
+        utils.log (True, '\n{} (TM) Python to JavaScript Small Sane Subset Transpiler Version {}\n', __envir__.transpiler_name.capitalize (), __envir__.transpiler_version)
+        utils.log (True, 'Copyright (C) Geatec Engineering. License: Apache 2.0\n\n')
+        
         utils.log (True, '\n')
         licensePath = '{}/{}'.format (transpilerDir, 'license_reference.txt')   
         if not os.path.isfile (licensePath):
             utils.log (True, 'Error: missing license reference file\n')
             return setExitCode (exitNoLicense)
             
-        utils.log (True, '{} (TM) Python to JavaScript Small Sane Subset Transpiler Version {}\n', __base__.__envir__.transpiler_name.capitalize (), __base__.__envir__.transpiler_version)
-        utils.log (True, 'Copyright (C) Geatec Engineering. License: Apache 2.0\n\n')
-        
         utils.commandArgs.parse ()
         
         if utils.commandArgs.license:
@@ -89,11 +111,38 @@ def main ():
             
         if not utils.commandArgs.source:
             return setExitCode (exitSourceNotGiven) # Should never be here, dealth with by command arg checks already
-                        
-        __symbols__ = utils.commandArgs.symbols.split ('$') if utils.commandArgs.symbols else []
+            
+        if utils.commandArgs.source.endswith ('.py') or utils.commandArgs.source.endswith ('.js'):
+            utils.commandArgs.source = utils.commandArgs.source [:-3]   # Ignore extension
+            # This may be done in a more concise way, but it runs deeper than it may seem, so test any changes extensively
         
+        # Prepend paths that are needed by transpiled or executed user code, since they have to be searched first
+        # So user code favors Transcrypt modules over CPython modules
+        extraDirs = utils.commandArgs.xpath.replace ('#', ' ') .split ('$') if utils.commandArgs.xpath else []
+        
+        sourcePath = utils.commandArgs.source.replace ('\\', '/')               # May be absolute or relative, in the latter case it may or may not specify a directory
+        if '/' in sourcePath:                                                   # If directory specified
+            sourceDir = sourcePath.rsplit ('/', 1)[0]                           #   Use it as source directory
+        else:                                                                   # Else
+            sourceDir = os.getcwd () .replace ('\\', '/')                       #   Use current working directory as source directory
+            
+        projectDirs = [sourceDir] + extraDirs
+        
+        sys.path [0 : 0] = projectDirs
+        
+        global transpilationDirs
+        transpilationDirs [0 : 0] = projectDirs 
+                       
+        __symbols__ = utils.commandArgs.symbols.split ('$') if utils.commandArgs.symbols else []
+            
         if utils.commandArgs.complex:
             __symbols__.append ('__complex__')
+
+        if utils.commandArgs.sform:
+            __symbols__.append ('__sform__')
+            
+        if utils.commandArgs.xtiny:
+            __symbols__.append ('__xtiny__')
             
         __symbols__.append ('__py{}.{}__'.format (* sys.version_info [:2]))
             
@@ -101,14 +150,17 @@ def main ():
             __symbols__.append ('__esv{}__'.format (utils.commandArgs.esv))
         else:
             __symbols__.append ('__esv{}__'.format (utils.defaultJavaScriptVersion))
-            
-        from org.transcrypt.stubs.browser import __set_stubsymbols__    # Import (ignored when transpiling) late, since commandArgs must be set already
-        __set_stubsymbols__ (__symbols__)                               # Make symbols available to CPython, seems that exec can't do that directly
+         
+        # Import (ignored when transpiling) late, since commandArgs must be set already
+        from org.transcrypt.stubs.browser import __set_stubsymbols__
+        
+        # Make symbols available to CPython, seems that exec can't do that directly
+        __set_stubsymbols__ (__symbols__)
         
         if utils.commandArgs.run:
             try:
-                with open (utils.commandArgs.source) as sourceFile:
-                    exec (sourceFile.read ())
+                with open (utils.commandArgs.source + '.py') as sourceFile:
+                    exec (sourceFile.read (), globals (), locals ())
                     return setExitCode (exitSuccess)
             except Exception as exception:
                 utils.log (True, 'Error: cannot run {} using CPython: {}\n'.format (utils.commandArgs.source, str (exception) .replace (' (<string>', '') .replace (')', '')))
@@ -116,7 +168,7 @@ def main ():
                 return setExitCode (exitCannotRunSource)
         else:
             try:
-                compiler.Program (compilerPath, __symbols__)
+                compiler.Program (transpilationDirs, __symbols__, __envir__)
                 return setExitCode (exitSuccess)
             except utils.Error as error:
                 utils.log (True, '\n{}\n', error)

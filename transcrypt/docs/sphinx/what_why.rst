@@ -22,16 +22,23 @@ At the basis of Transcrypt lies the following shopping list:
 
 - Python syntax
 - Small downloads
-- No barriers to the JavaScript / JQuery / DOM world
+- No barriers to the DOM or to any JavaScript library
 - Dynamic typing
-- 'Classic' object orientation including multiple inheritance
+- Multiple inheritance
 - Static transpilation
 - Lambda’s
-- Named parameters
+- Named and default parameters
 - Lists, dicts and sets
-- List comprehensions
+- List and other comprehensions
 - Nested tuple assignment
 - Assignment of bound functions
+- Locally controlled operator overloading
+- Async / await
+- Metaclasses
+- Modules, compilation units and a component loader
+- Optional static typechecking
+- Source maps
+- Built-in minification
 
 At the advent of Transcrypt there were many Python to JavaScript transpiler projects around, some of them quite mature. Neither of them fitted the above shopping list. Either the downloads were too large, or some of must have features were missing. To some, the shopping list may seem weird. Multiple inheritance? The whole Java world is doing without it. Exactly. And that's one of the reasons why a large category of developers shunned Java from the start. To them multiple inheritance has proven a powerful tool ever since it was introduced in C++.
 
@@ -47,7 +54,7 @@ There's a category of libraries c.q. applications that are probably developed ea
 Code structure
 --------------
 
-In the JavaScript world, components are gathered from everywhere on the web during a page load, and small fragments of code may be anywhere in a web page. Transcrypt takes a different approach. The concept of a static webpage is secundary and may even be absent. Typically there's one and only one Transcrypt application attachted to a certain URL or page. This application has it's own namespace and may feature many entrypoints or callbacks attached to DOM components. Although traditional web pages can be made without restrictions using Transcrypt, the focus is on complex stateful web applications rather than on static pages interspersed with code fragments. Typically such a web application will rely on the server to store and retrieve data and program state. Although at some point 'pythonic' libraries may come into existence to facilitate this, direct use of JavaScript AJAX or e.g. of a JQuery AJAX wrapper, will do the job fine.
+In the JavaScript world, components are gathered from everywhere on the web during a page load, and small fragments of code may be anywhere in a web page. Transcrypt takes a different approach. The concept of a static webpage is secundary and may even be absent. Typically there's one and only one Transcrypt application attachted to a certain URL or page. This application has its own namespace and may feature many entrypoints or callbacks attached to DOM components. Although traditional web pages can be made without restrictions using Transcrypt, the focus is on complex stateful web applications rather than on static pages interspersed with code fragments. Typically such a web application will rely on the server to store and retrieve data and program state. Although at some point 'pythonic' libraries may come into existence to facilitate this, direct use of JavaScript AJAX or e.g. of a JQuery AJAX wrapper, will do the job fine.
 
 Debuggability
 -------------

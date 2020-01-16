@@ -5,8 +5,7 @@ Practical example: a simple, responsive website using no HTML or CSS at all
 ---------------------------------------------------------------------------
 
 To many programmers, using 'static' HTML and CSS feels like being locked up in a closet.
-As an alternative, responsiveness can simply be programmed using Transcrypt, as can be seen on `this site written in Transcrypt <http://www.wiskundeles.com>`_.
-Note that it features sourcemaps.
+As an alternative, responsiveness can simply be programmed using Transcrypt, as can be seen on `the website of Transcrypt itself <http://www.transcrypt.org>`_.
 The site adapts to diverse screen formats, device types and landscape vs. portrait mode.
 
 SVG example: Turtle graphics
@@ -48,18 +47,32 @@ Remark: In a later stage animation may be added. As a further step, for complica
 Mixed examples
 ==============
 
+Example: Pong
+-------------
+
+In using the fabric.js JavaScript library this for example, the only thing differing from plain JavaScipt is that *new <constructor>* is replaced by *__new__ (<constructor>)*.
+
+.. _code_pong:
+
++----------------------------------------------+---------------------------------------------------------+
+| .. literalinclude:: ../../demos/pong/pong.py | .. literalinclude:: ../../demos/pong/__target__/pong.js |
+|    :tab-width: 4                             |    :tab-width: 4                                        |
+|    :caption: pong.py                         |    :caption: pong.js                                    |
++----------------------------------------------+---------------------------------------------------------+
+
+
 Three ways of integration with JavaScript libraries
----------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are three ways to integrate Transcrypt applications with existing JavaScript libraries.
 
 1. The simplest way is to use the library as is, without any encapsulation. In this way all symbols of that library will be in the global namespace. While many JavaScript programmers don't seem to mind that, many Python programmers do.
 
-2. Another way is to encapsulate the JavaScript library as a whole in a Transcrypt module. In the distibution this is done for the *fabric* module, that encapsulates *fabric.js*. In this way the global namespace stays clean.
+2. Another way is to encapsulate the JavaScript library as a whole in a Transcrypt module. In the distibution this is done for the *fabric* module, that encapsulates *fabric.js* and is imported in the Pong example. In this way the global namespace stays clean.
 
 3. The third way is to write a complete Pythonic API for the JavaScript library. This is overkill in most cases and makes it harder to keep up with new versions of the library. Note that Transcrypt was desiged to make seamless cooperation between Transcrypt and JavaScript libraries possible without any glue code.
 
-In the Pong example below, approach 2 is choosen to encapsulate the fabric.js graphics library. In most cases this approach strikes a good balance between effort and yield. As can be seen below, the effort involved is minimal.
+In most cases this approach 2 strikes a good balance between effort and yield. As can be seen below, the effort involved is minimal.
 
 .. _code_encaps_fabric:
 
@@ -67,38 +80,25 @@ In the Pong example below, approach 2 is choosen to encapsulate the fabric.js gr
 	:tab-width: 4
 	:caption: The encapsulation layer for fabric.js
 	
-Note that __pragma__ ('js', <skeletoncode>, includes = [<file1>, <file2>, ..]) is used to achieve the encapsulation. It replaces the {} by the respective contents of the files. The *fabric* module is part of the download. Note that not all facilities were included in customizing fabric.js. You can drop-in replace the *fabric.js* in the __javascript__ subdirectory by another customized version without changing anything. Preferably download a development version, since that enables easy debugging. Transcryp will minify it for you on the fly.
+Note that __pragma__ ('js', <skeletoncode>, includes = [<file1>, <file2>, ..]) is used to achieve the encapsulation. It replaces the {} by the respective contents of the files. The *fabric* module is part of the download. Note that not all facilities were included in customizing fabric.js. You can drop-in replace the *fabric.js* by another customized version without changing anything. Preferably download a development version, since that enables easy debugging. Transcryp will minify it for you on the fly.
 
-Example: Pong
--------------
+Minification
+~~~~~~~~~~~~
 
-In using the fabric.js JavaScript library this example, the only thing differing from plain JavaScipt is that *new <constructor>* is replaced by *__new__ (<constructor>)*.
+Minification is currently performed by the Google closure compiler, that's also part of the distribution. Currently closures ADVANCED_OPTIMIZATIONS switch breaks the working *strict* code, however, so the SIMPLE_OPTIMIZATIONS switch is used by default.
 
-.. _code_pong:
-
-+----------------------------------------------+-----------------------------------------------------------------+
-| .. literalinclude:: ../../demos/pong/pong.py | .. literalinclude:: ../../demos/pong/__javascript__/pong.mod.js |
-|    :tab-width: 4                             |    :tab-width: 4                                                |
-|    :caption: pong.py                         |    :caption: pong.mod.js                                        |
-+----------------------------------------------+-----------------------------------------------------------------+
-
-Joined minification
--------------------
-
-Minification is currently performed by the Google closure compiler, that's also part of the distribution. Rather than separately minifying libraries, the application is minified as a whole. In principle this enables a smaller total download size. Currently closures ADVANCED_OPTIMIZATIONS switch breaks the working *strict* code, however, so the SIMPLE_OPTIMIZATIONS switch is used by default.
-
-As can be seen from the listings, *pong.mod.js* without libraries is only slightly longer than *pong.py* without libraries. The difference mainly comes from the expensive keyword arguments mechanism that is activated for the *reset* function, using *__pragma__ ('kargs')* and *__pragma__ ('nokwargs')*. The minified version is about half this size. The Transcrypt runtime itself in minified form is about 9kB. So the bulk of the total size of the minified file, 148kB comes from *fabric.js*. From this example it becomes clear that Transcrypt is extremely lightweight.
+As can be seen from the listings of the Pong example, even the non-minified *pong.js* module is only slightly larger than *pong.py*. This is despite the expensive keyword arguments mechanism that is activated for the *reset* function, using *__pragma__ ('kargs')* and *__pragma__ ('nokwargs')*. The minified but not treeshaked Transcrypt runtime is slightly above 40 kB. The *fabric.js* library on the other hand occupies 180 kB. From this example it becomes clear that Transcrypt is extremely lightweight.
 
 Example: jQuery
 ---------------
 
 In contrast to the use of the *fabric.js* library in the Pong example, *jQuery* hasn't been encapsulated at all. It's just downloaded on the fly from a content delivery network and used as-is. Instead of the *$* (that is not a valid Python identifier), an *S* is used as :ref:`alias <pragma_alias>`. This might have been any character sequence.
 
-+------------------------------------------------------------+-------------------------------------------------------------------------------+
-| .. literalinclude:: ../../demos/jquery_demo/jquery_demo.py | .. literalinclude:: ../../demos/jquery_demo/__javascript__/jquery_demo.mod.js |
-|    :tab-width: 4                                           |    :tab-width: 4                                                              |
-|    :caption: jquery_demo.py                                |    :caption: jquery_demo.mod.js                                               |
-+------------------------------------------------------------+-------------------------------------------------------------------------------+
++------------------------------------------------------------+-----------------------------------------------------------------------+
+| .. literalinclude:: ../../demos/jquery_demo/jquery_demo.py | .. literalinclude:: ../../demos/jquery_demo/__target__/jquery_demo.js |
+|    :tab-width: 4                                           |    :tab-width: 4                                                      |
+|    :caption: jquery_demo.py                                |    :caption: jquery_demo.js                                           |
++------------------------------------------------------------+-----------------------------------------------------------------------+
 
 Example: iOS web app with native look and feel
 ----------------------------------------------
@@ -142,22 +142,22 @@ Example: D3.js
 
 The *D3.js* graphics library offers animation by data driven DOM manipulation. It combines well with class based object oriented programming as supported by Trancrypt, leading to applications that are easy to understand and maintain.
 
-+--------------------------------------------------------+---------------------------------------------------------------------------+
-| .. literalinclude:: ../../demos/d3js_demo/d3js_demo.py | .. literalinclude:: ../../demos/d3js_demo/__javascript__/d3js_demo.mod.js |
-|    :tab-width: 4                                       |    :tab-width: 4                                                          |
-|    :caption: d3js_demo.py                              |    :caption: d3js_demo.mod.js                                             |
-+--------------------------------------------------------+---------------------------------------------------------------------------+
++--------------------------------------------------------+-------------------------------------------------------------------+
+| .. literalinclude:: ../../demos/d3js_demo/d3js_demo.py | .. literalinclude:: ../../demos/d3js_demo/__target__/d3js_demo.js |
+|    :tab-width: 4                                       |    :tab-width: 4                                                  |
+|    :caption: d3js_demo.py                              |    :caption: d3js_demo.js                                         |
++--------------------------------------------------------+-------------------------------------------------------------------+
 
 Example: React
 --------------
 
 *React* is a JavaScript library for easy creation of interactive UI's. Changes to the UI are made by fast manipulation of a light-weight virtual DOM. The real DOM, which is much slower to manipulate, is then compared with the altered virtual DOM and updated efficiently in a minimum number of steps. This way of working leads to good performance, at the same time keeping a straightforward structure of application UI code, since the complexities of optimizing DOM updates are left to the React library. React is unintrusive and mixes well with Transcrypt, allowing creation of extensive web applications that combine maintainability with speed. This example once again clearly illustrates the philosophy behind Transcrypt: rather than confining you to a "parallel" universe that could never keep up, Transcrypt offers you direct access to the ever expanding universe of innovative JavaScript libraries.
 
-+----------------------------------------------------------+-----------------------------------------------------------------------------+
-| .. literalinclude:: ../../demos/react_demo/react_demo.py | .. literalinclude:: ../../demos/react_demo/__javascript__/react_demo.mod.js |
-|    :tab-width: 4                                         |    :tab-width: 4                                                            |
-|    :caption: react_demo.py                               |    :caption: react_demo.mod.js                                              |
-+----------------------------------------------------------+-----------------------------------------------------------------------------+
++----------------------------------------------------------+---------------------------------------------------------------------+
+| .. literalinclude:: ../../demos/react_demo/react_demo.py | .. literalinclude:: ../../demos/react_demo/__target__/react_demo.js |
+|    :tab-width: 4                                         |    :tab-width: 4                                                    |
+|    :caption: react_demo.py                               |    :caption: react_demo.js                                          |
++----------------------------------------------------------+---------------------------------------------------------------------+
 
 Example: Riot
 -------------
@@ -176,17 +176,17 @@ Example: Riot
 |    :caption: sample.tag, a classic Riot tag               |    :caption: sample.js, compiled by Riot                 |
 +-----------------------------------------------------------+----------------------------------------------------------+
 
-+-----------------------------------------------------------------+--------------------------------------------------------------------------+
-| .. literalinclude:: ../../demos/riot_demo/riot_tag.py           | .. literalinclude:: ../../demos/riot_demo/__javascript__/riot_tag.mod.js |
-|    :tab-width: 4                                                |    :tab-width: 4                                                         |
-|    :caption: riot_tag.py, baseclass of all Transcrypt Riot tags |    :caption: riot_tag.mod.js, compiled by Transcrypt                     |
-+-----------------------------------------------------------------+--------------------------------------------------------------------------+
++-----------------------------------------------------------------+------------------------------------------------------------------+
+| .. literalinclude:: ../../demos/riot_demo/riot_tag.py           | .. literalinclude:: ../../demos/riot_demo/__target__/riot_tag.js |
+|    :tab-width: 4                                                |    :tab-width: 4                                                 |
+|    :caption: riot_tag.py, baseclass of all Transcrypt Riot tags |    :caption: riot_tag.js, compiled by Transcrypt                 |
++-----------------------------------------------------------------+------------------------------------------------------------------+
 
-+----------------------------------------------------------------+---------------------------------------------------------------------------+
-| .. literalinclude:: ../../demos/riot_demo/riot_demo.py         | .. literalinclude:: ../../demos/riot_demo/__javascript__/riot_demo.mod.js |
-|    :tab-width: 4                                               |    :tab-width: 4                                                          |
-|    :caption: riot_demo.py, a derived Transcrypt Riot tag class |    :caption: riot_demo.mod.js, compiled by Transcrypt                     |
-+----------------------------------------------------------------+---------------------------------------------------------------------------+
++----------------------------------------------------------------+-------------------------------------------------------------------+
+| .. literalinclude:: ../../demos/riot_demo/riot_demo.py         | .. literalinclude:: ../../demos/riot_demo/__target__/riot_demo.js |
+|    :tab-width: 4                                               |    :tab-width: 4                                                  |
+|    :caption: riot_demo.py, a derived Transcrypt Riot tag class |    :caption: riot_demo.js, compiled by Transcrypt                 |
++----------------------------------------------------------------+-------------------------------------------------------------------+
 
 Example: Using input and print in a DOM __terminal__ element in your browser
 ----------------------------------------------------------------------------
@@ -206,3 +206,42 @@ This means that you can write applications with blocking I/O, rather than event 
 |    :tab-width: 4                                               |
 |    :caption: terminal_demo.py                                  |
 +----------------------------------------------------------------+
+
+Example: Using the Parcel.js bundler to package a set of modules written in diverse programming languages
+---------------------------------------------------------------------------------------------------------
+
+Bundlers are increasingly popular in the world of web development.
+With the Parcel bundler, it is possible to integrate Transcrypt modules with modules written in other languages.
+Whenever the source code of any module changes, automatic recompilation and repackaging takes place.
+Sourcemaps are generated for all non-JavaScript modules, enabling source level debugging in the browser.
+
+In the example, the top level file of the module hierarchy is the html file below: 
+
++----------------------------------------------------------------+
+| .. literalinclude:: ../../demos/parcel_demo/example/index.html |
+|    :tab-width: 4                                               |
+|    :caption: index.html                                        |
++----------------------------------------------------------------+
+
+The html file above refers to the JavaScript file below:
+
++--------------------------------------------------------------+
+| .. literalinclude:: ../../demos/parcel_demo/example/index.js |
+|    :tab-width: 4                                             |
+|    :caption: index.js                                        |
++--------------------------------------------------------------+
+
+This top level JavaScript file in turn refers to a Python file,
+that makes use of many modules, some written in Python, some in JavaScript:
+
++-------------------------------------------------------------+
+| .. literalinclude:: ../../demos/parcel_demo/example/main.py |
+|    :tab-width: 4                                            |
+|    :caption: main.py                                        |
++-------------------------------------------------------------+
+
+Whenever a source file of this mixed bag of modules is changed,
+the whole module hierarchy is rebuilt and repackaged.
+The bundler gets its information from the *.project* file in the *__target__* directory.
+Consequently Transcrypt can be fully integrated in an automated build process for a project featuring an arbitrary mix of source languages.
+With this feature, Python has truly become a first class citizen in the browser world.

@@ -1,6 +1,8 @@
 Special facilities
 ==================
 
+.. _module_mechanism:
+
 Transcrypt's module mechanism
 -----------------------------
 
@@ -11,52 +13,50 @@ Firstly, in Transcrypt it is good practice to use url-based unique module identi
 - *org.python.pypi.<my module name>*
 - *com.<my company name>.<my module name>*
 
-To achieve optimal CPython compatibility, an exception is made for modules that are part of the CPython distribution, e.g.
-
- 
+To achieve optimal CPython compatibility, an exception is made for modules that are part of the CPython distribution, e.g. *math*.
 	
-Note that Transcrypt is meant be to used with JavaScript rather than Python libraries, to keep it lightweight. Nevertheless porting (part of) some standard libraries might be handy. If you do, you're invited to make them available via PyPi, using 'Transcrypt' in your keyword list.
+Note that Transcrypt is meant be to used with JavaScript rather than Python libraries, since its focus isn't on the desktop but on the browser. Nevertheless a growing set of standard Python modules is part of the distribution, currently cmat, datetime, itertools, logging, math, random (partially), re (almost complete), time, turtle and warnings. Other modules are in the making.
 
 Finding the code for a module proceeds as follows:
 
 Suppose you import a module *all.the.kings.men*. Then the following paths will be searched respectively:
 
 	+ *<directory of your main module>/all/the/kings/men.py*
-	+ *<directory of your main module>/all/the/kings/__javascript__/men.mod.js*
-	+ *<directory of your main module>/all/the/kings/men/__init__py*
-	+ *<directory of your main module>/all/the/kings/men/__javascript__/__init__.mod.js*
+	+ *<directory of your main module>/all/the/kings/men.js*
+	+ *<directory of your main module>/all/the/kings/men/__init__.py*
+	+ *<directory of your main module>/all/the/kings/men/__init__.js*
 	
 	- *transcrypt/Transcrypt/modules/all/the/kings/men.py*
-	- *transcrypt/Transcrypt/modules/all/the/kings/__javascript__/men.mod.js*
+	- *transcrypt/Transcrypt/modules/all/the/kings/men.js*
 	- *transcrypt/Transcrypt/modules/all/the/kings/men/__init__py*
-	- *transcrypt/Transcrypt/modules/all/the/kings/men/__javascript__/__init__.mod.js*
+	- *transcrypt/Transcrypt/modules/all/the/kings/men/__init__js*
 	
 	+ *<CPython packages directory 1>/all/the/kings/men.py*
-	+ *<CPython packages directory 1>/all/the/kings/__javascript__/men.mod.js*
-	+ *<CPython packages directory 1>/all/the/kings/men/__init__py*
-	+ *<CPython packages directory 1>/all/the/kings/men/__javascript__/__init__.mod.js*
+	+ *<CPython packages directory 1>/all/the/kings/men.js*
+	+ *<CPython packages directory 1>/all/the/kings/men/__init__.py*
+	+ *<CPython packages directory 1>/all/the/kings/men/__init__.js*
 	
 	- *<CPython packages directory 2>/all/the/kings/men.py*
-	- *<CPython packages directory 2>/all/the/kings/__javascript__/men.mod.js*
-	- *<CPython packages directory 2>/all/the/kings/men/__init__py*
-	- *<CPython packages directory 2>/all/the/kings/men/__javascript__/__init__.mod.js*
+	- *<CPython packages directory 2>/all/the/kings/men.js*
+	- *<CPython packages directory 2>/all/the/kings/men/__init__.py*
+	- *<CPython packages directory 2>/all/the/kings/men/__init__.js*
 
 	+ *More CPython packages directories*
 
-As can be seen from the above list, modules local to your project take precedence of modules available in Transcrypt, which again take precedence over modules available globally in CPython. Note that even if modules are made available globally in CPython, importing them in Transcrypt gives special possibilities and restrictions. They are allowed to be written in native JavaScript, in which case they reside in the __javascript__ subdirectory of the module. They should not depend on C, C++ or features that are outside Python subset supported by Transcrypt.
+As can be seen from the above list, modules local to your project take precedence over modules available in Transcrypt, which again take precedence over modules available globally in CPython. Note that even if modules are made available globally in CPython, importing them in Transcrypt gives special possibilities and restrictions. They are allowed to be written in native JavaScript, in which case they reside in the __javascript__ subdirectory of the module. They should not depend on C, C++ or features that are outside Python subset supported by Transcrypt.
 
 Although under these guidelines it's quite possible to write modules that are importable both by CPyton and Transcrypt, most Transcrypt modules will be come from the JavaScript, rather than from the Python ecosystem. If both a Python and a JavaScript incarnation of a module are present, the Python module is only recompiled if it's younger than the corresponding JavaScript module, unless the -b switch is used.
 
-Furthermore, note that the *__init__.py* or *__init__.mod.js* file of a module is executed if and only if that module is imported, not if it's just somewhere in the hierarchy of directories containing that module. Furthermore the global code of a module is executed only once, no matter how often that module is imported, as is equally the case with CPython.
+Furthermore, note that the *__init__.py* or *__init__.js* file of a module is executed if and only if that module is imported, not if it's just somewhere in the hierarchy of directories containing that module. Furthermore the global code of a module is executed only once, no matter how often that module is imported, as is equally the case with CPython.
 
 Another deviation from CPython is that the inclusion of a module has to be decided upon compiletime. This means that imports cannot be runtime conditional, so e.g. cannot be under an *if*. For compiletime conditional imports you can use
 :ref:`\_\_pragma\_\_ ('ifdef') <pragma_ifdef>`. Also, since imports are resolved in one pass, cyclic imports are not supported.
 
-As a consequence of the above, modules may be distributed as Python *.py* files, but also as JavaScript-only *.mod.js* files. The JavaScript files may be hand written or generated by any tool including Transcrypt. Although they may be distributed in minified form, don't give them the extension *.mod.min.js*, that exension is reserved for minification by Transcrypt itself. Since Trancrypt will minify your files anyhow, you're encouraged to distribute the original, human readable sources, to facilitate debugging by users of your library.
+As a consequence of the above, modules may be distributed as Python *.py* files, but also as JavaScript-only *.js* files. The JavaScript files may be hand written or generated by any tool including Transcrypt.
 
 Using browser stubs to test non-GUI code that uses console.log and window.alert
 -------------------------------------------------------------------------------
-To test the non-GUI part of your code in a desktop rather than a browser environment, use *from org.transcrypt.stubs.browser import \**. This will allow you to call the *window.alert* and *console.log* functions in your code when you run it from the command prompt, using the -r command line switch: *transcrypt -r <my main file name>*. This will invoke CPython, searching the appropriate module paths as compilation would have done.
+To test the non-GUI part of your code in a desktop rather than a browser environment, use *from org.transcrypt.stubs.browser import \**. This will allow you to call the *window.alert* and *console.log* functions in your code when you run it from the command prompt, using the -r command line switch: *transcrypt -r <my main module name>*. This will invoke CPython, searching the appropriate module paths as compilation would have done.
 
 Creating JavaScript objects with __new__ (<constructor call>)
 -------------------------------------------------------------
@@ -70,9 +70,10 @@ As a third alternative, encapsulation can be done in Python rather than JavaScri
 The __pragma__ mechanism
 ------------------------
 
-Pragma's are directives in the source code, that locally alter the behaviour of the compiler. Pragma's come in two varieties.
+Pragma's are directives in the source code, that locally alter the behaviour of the compiler. Pragma's come in four varieties.
 
-The function-like variety:
+The function-like variety
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *__pragma__ (<parameters>)*
 
@@ -80,24 +81,50 @@ is acceptable only to Transcrypt, CPython requires a stub with parameter *\*args
 
 *from org.transcrypt.stubs.browser import __pragma__*
 
-The comment-like variety:
+The comment-like variety
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 # __pragma__ (<parameters>)
 
 is acceptable both to Transcrypt and CPython. In CPython it does nothing.
 
-N.B. Both varieties have to be properly indented, matching indentation of their context.
+N.B. Both varieties above have to be properly indented, matching indentation of their context.
+
+The single-line activation variety
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<line of code> # __:<single parameter>
+
+It will switch a facility on or off just for the line of code it's part of.
+Single line pragma's can only be used for pragma's which have a single parameter, it's name.
+
+For example the following line:
+
+*vector2 = vector0 + vector1 # __:opov*
+
+will be compiled identically to:
+
+*__pragma__ ('opov'); vector2 = vector0 + vector1; __pragma__ ('noopov')*
+
+The single-line deactivation variety
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*scalar2 = scalar0 + scalar1 # __:noopov*
+
+will be compiled identically to:
+
+*__pragma__ ('noopov'); scalar2 = scalar0 + scalar1; __pragma__ ('opov')*
 
 .. _pragma_alias:
 
 Identifier aliasing: __pragma__ ('alias', ...) and __pragma__ ('noalias', ...)
---------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 Calling *__pragma__ ('alias', <Python id part>, <JavaScript id part>)* at the start of a module will replace identifiers or parts thereof like in the following examples:
 
 Example 1:
 
 +---------------------------------------------------------------------+
-| Used at the start of the module: *__pragma__ ('alias', 'S', $)*     |
+| Used at the start of the module: *__pragma__ ('alias', 'S', '$')*   |
 +------------------------------------------+--------------------------+
 | Original in Python:                      | Alias in JavaScript:     |
 +------------------------------------------+--------------------------+
@@ -122,7 +149,7 @@ Example 2:
 | *jq__body = jq (body)*                  | *$body = $ ('body')*    |
 +-----------------------------------------+-------------------------+
 
-Note that the generated JavaScript only the modified identifiers will be present, not the original ones. So the JavaScript identifiers are only aliases for the Python ones, not for any identifier in the JavaScript code itself.
+Note that in the generated JavaScript only the modified identifiers will be present, not the original ones. So the JavaScript identifiers are only aliases for the Python ones, not for any identifier in the JavaScript code itself.
 
 A number of aliases are predefined in the source code of Transcrypt as follows:
 
@@ -142,6 +169,20 @@ Generating __doc__ attributes from docstrings: __pragma__ ('docat') and __pragma
 ----------------------------------------------------------------------------------------------
 Even though docstrings may be present in your code, by default *__doc__* attributes are not generated, to keep the generated JavaScript code lean. You can switch on and off generation of *__doc__* attributes for modules, classes, methods and functions with *__pragma__ ('docat')* and *__pragma__ ('nodocat')* respectively. There's also a *-d* / *--docat* command line switch, which can be overruled per module by *__pragma__ ('nodocat')*. Advice: Though these pragma's are flexible, its advisable to use them only at the spot indicated in the :ref:`docstrings testlet <autotest_docstrings>`, to retain CPython compatibility. Note that *__pragma__ ('docat')* follows rather than precedes the module docstring, since CPython dictates the module docstring to be the first statement in a module.
 
+Skipping Transcrypt code fragments when running with CPython: __pragma__ ('ecom') and __pragma__ ('noecom')
+-------------------------------------------------------------------------------------------------------------
+Executable comments are specially formatted comments, that are turned into executable statements by Transcrypt but, by nature, skipped by CPython.
+There are two types of executable comments: single-line and multi-line. Single-line executable comments start with #? at the current indentation level.
+Multi-line executable comments start with *'''?* or *"""?* and end with *?'''* or *?"""*, again at the current indentation level. There's also a *-ecom* command line switch, that can be annihilated locally by *__pragma__ ('noecom')* or its single line equivalent.
+
+If you want the opposite, skipping code in Transcrypt but executing it with CPython, use the the  :ref:`__pragma__ ('skip') ... __pragma__ ('noskip') <skipping_fragments>` pair or its single-line variety.
+
+An example of skipping code on either platform is the testlet below:
+
+.. literalinclude:: ../../development/automated_tests/transcrypt/executable_comments/__init__.py
+	:tab-width: 4
+	:caption: The use of executable comments and, for the opposite effect, __pragma__ ('skip') and __pragma__ ('noskip')
+
 Surpassing the speed of native JavaScript: __pragma__ ('fcall') and __pragma ('nofcall')
 ----------------------------------------------------------------------------------------
 Fast calls or fcalls are method calls where the method isn't an attribute of an object's prototype, but of the object itself, even if this method is inherited over multiple levels. This means that only for the first call the prototype chain is searched and the method is bound to the object. All subsequent calls invoke the bound method directly on the object. You can use the -f command line switch to generate fcall's pervasively, making your objects slightly larger since they will contain references to their methods. If you don't want that, just place the definition of the method(s) or class(es) you wish to optimize between   *__pragma__ ('fcall')* and *__pragma__ ('nofcall')*. You can also do the opposite, using the -f switch and exempting some method(s) or class(es) by embedding them between *__pragma__ ('nofcall')* and *__pragma__ ('fcall')*.
@@ -149,7 +190,7 @@ Fast calls or fcalls are method calls where the method isn't an attribute of an 
 Note that these pragmas have to be applied on the function definition location rather than the call location. Placing *__pragma__ ('fcall')* or *__pragma__ ('nofcall')* at the beginning of a module will influence all methods defined in that module. The fcall mechanism is a form of memoization and one example of a transpiler being able to generate optimized code that surpasses common hand coding practice. The fcall mechanism influences neither the pure Python syntax nor the semantics of your program.
 
 Enabling Pythons *send* syntax: __pragma__ ('gsend') and __pragma ('nogsend')
-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 
 These pragmas enable respectively disable use of Pythons *send* syntax for generators, which is disabled by default. An example of its use is in the following code:
 
@@ -157,7 +198,7 @@ These pragmas enable respectively disable use of Pythons *send* syntax for gener
 	:start-after: BEGIN 1st example with 'send'
 	:end-before: END 1st example with 'send'
 	:tab-width: 4
-	:caption: Use of __pragma ('gsend') to enable Pythons *send* syntax fo generators 
+	:caption: Use of __pragma__ ('gsend') to enable Pythons *send* syntax fo generators 
 
 Automatic conversion to iterable: __pragma__ ('iconv') and __pragma__ ('noiconv')
 ---------------------------------------------------------------------------------
@@ -169,15 +210,9 @@ Conditional compilation: __pragma__ ('ifdef', <symbol>), __pragma__ ('ifndef', <
 --------------------------------------------------------------------------------------------------------------------------------------
 A piece of code in between *__pragma__ ('ifdef', <symbol>)* and *__pragma__ ('endif')* will only be compiled if <symbol> occurs in the global list of defined symbols.
 
-This pragma works mainly in combination with the *-s* / *--symbols <names joined by $>* command line option. On top of that, some command line options automatically add symbols, without using the *-s* switch. An example is *-e 6* option, which adds the symbol *e6* to the global list of defined symbols.
+This pragma works mainly in combination with the *-s* / *--symbols <names joined by $>* command line option. On top of that, some command line options automatically add symbols, without using the *-s* switch.
 
-An example of the use of this pragma is found the autotest code below:
-
-.. literalinclude:: ../../development/automated_tests/transcrypt/autotest.py
-	:tab-width: 4
-	:caption: Use of conditional compilation to prevent Transcrypt code that requires JavaScript 6 from being compiled in the JavaScript 5 mode.
-	
-Note that in the example above, the compilation command is *transcrypt -e 6 autotest.py*. The *-e 6* switch forces compilation in JavaScript 6 mode and automatically adds *e6* to the global list of defined symbols. The presence of the *e6* symbol activates compilation of Transcrypt code that needs JavaScript 6 mode, by use of the *__pragma__ ('ifdef', 'e6')* and *__pragma__ ('endif')*.
+TODO: Add example
 
 Code after *__pragma__ ('ifndef', <symbol>)* is compiled if <symbol> is NOT defined. To choose between two alternative source code blocks, precede the second block with *__pragma__ ('else')* and terminate it with *__pragma__ ('endif')*.
 
@@ -193,18 +228,6 @@ An example of its use is to encapsulate a JavaScript library as a Python module,
 
 Note that since {} is used as placeholder in Python formatting, any normal { and } in your JavaScript in the code parameter have to be doubled. If you just want to include a literal piece of JavaScript without any replacements, you can avoid this doubling by using __pragma__ ('js', '{}', <my_piece_of_JS_code>). 
 
-Create bare JavaScript objects and iterate over their attributes from Python: __pragma__ ('jsiter') and __pragma__ ('nojsiter')
--------------------------------------------------------------------------------------------------------------------------------
-Normally a Python *{...}* literal is compiled to *dict ({...})* to include the special attributes and methods of a Python dict, including e.g. an iterator. When *__pragma__ ('jsiter')* is active, a *Python {...}* literal is compiled to a bare *{...}*, without special attributes or methods. To still be able to iterate over the attributes of such a bare JavaScript object from Python, when *__pragma__ ('jsiter')* is active, a Python *for ... in ...* is literally translated to a JavaScript *for (var ... in ...)*. The main use case for this pragma is conveniently looping through class attributes in the *__new__* method of a metaclass. As a more flexible, but less convenient alternative, *__pragma__ ('js', '{}', '''...''')* can be used.
-
-An example of the use of this pragma is the following:
-
-.. literalinclude:: ../../development/automated_tests/transcrypt/metaclasses/__init__.py
-	:start-after: from org.transcrypt.stubs.browser import __pragma__
-	:end-before: class Uppercaser (metaclass = UppercaserMeta):
-	:tab-width: 4
-	:caption: Use of __pragma__ ('jsiter') and __pragma ('nojsiter') to manipulate class attributes in a metaclass
-
 __pragma__ ('jskeys') and __pragma__ ('nojskeys')
 -------------------------------------------------
 Normally in Python, dictionary keys without quotes are interpreted as identifiers and dictionary keys with quotes as string literals. This is more flexible than the JavaScript approach, where dictionary keys with or without quotes are always interpreted as string literals. However to better match the documentation and habits with some JavaScript libraries, such as plotly.js, dictionary keys without quotes can be optionally interpreted as string literals. While the -jk command line switch achieves this globally, the preferred way is to switch on and off this facility locally.
@@ -212,6 +235,10 @@ Normally in Python, dictionary keys without quotes are interpreted as identifier
 Keeping your code lean: __pragma__ ('jsmod') and __pragma__ ('nojsmod')
 -----------------------------------------------------------------------
 When *__pragma__ ('jsmod')* is active, *%* has JavaScript rather than Python semantics. While the -jm command line switch achieves this globally, the preferred way is to switch on and off this facility locally.
+
+__pragma__ ('keycheck') and __pragma__ ('nokeycheck')
+-----------------------------------------------------
+When *__pragma__ ('keycheck')* is active, an attempt to retrieve an element from a dictionary via a non-existing key results in a KeyError being raised, unless it happens at the lefthand side of an augmented assignment. The run time support for this is expensive, as it requires passing the result of every such retrieval to a function that checks the definedness of the result. While the -kc command line switch switches key checking on globally, the preferred way is to switch on and off this facility locally to prevent code bloat.
 
 Keeping your code lean: __pragma__ ('kwargs') and __pragma__ ('nokwargs')
 -------------------------------------------------------------------------
@@ -231,8 +258,8 @@ Formula v4 = M \* (v1 + v2) + v3 is probably preferred over v4 = add (mul (M, ad
 
 .. _skipping_fragments:
 
-Skipping fragments while generating code : __pragma__ ('skip') and __pragma__ ('noskip')
-----------------------------------------------------------------------------------------
+Skipping fragments while generating code: __pragma__ ('skip') and __pragma__ ('noskip')
+---------------------------------------------------------------------------------------
 On some occasions it's handy to be able to skip code generation for fragments of Python source. The most important use case is when you perform a static check using the :ref:`-c or --check <command_line_switches>` command line switch. If you use global JavaScript names without importing them from some encapsulation module, you'll have to tell the static checker that these names are not to be flagged as undefined. Insert a line containing dummy definitions of the unknown names for the static checker, surrounded by *__pragma__ ('skip') and __pragma__ ('noskip')*, to make code generator skip these definitions. The beginning of the source code of the Pong demo, shown below, demonstates how this is done.
 
 .. literalinclude:: ../../demos/pong/pong.py
@@ -244,3 +271,43 @@ Automatic conversion to truth value: __pragma__ ('tconv') and __pragma__ ('notco
 ------------------------------------------------------------------------------------
 
 When automatic conversion to truth value is activated, an empty array, dict or set has truth value False just as in CPyton, rather than True, as would be the case natively in JavaScript. This comes at the expense of a runtime typecheck and is by default avoided in Transcrypt for that reason. To switch on automatic conversion to truth values locally, *__pragma__ ('tconv')* and *__pragma__ ('notconv')* can be used. The alternative is to switch on automatic conversion globally using the -t command line switch. Use of this switch is disadvised if a lot of boolean expressions are computed in inner loops, since it would result in many extra typechecks. When designing performance sensitive libraries, it's advisable to use *__pragma__ ('notconv')* explicitly at the start of each performance-sensitive module. The result will be that even when an application developer chooses to use the -t switch, performance of won't suffer.
+
+Adding directories to the module search path: __pragma__ ('xpath', <directory list>)
+------------------------------------------------------------------------------------
+
+In addition to the :ref:`regular module mechanism <module_mechanism>` you can use *# __pragma__ ('xpath', <directory list>)* to add directories to the module search path. Note that resolving search paths happens compile time, so dynamic manipulation of the module search path doesn't apply. If you want to alter the search path in code that is used both by Transcrypt and CPython, you can additionally manipulate *sys.path* in a *try* clause or under an *if* with condition *__envir__.executor_name == __envir__.interpreter_name*.
+
+The *-xp / --xpath* :ref:`command line switch <command_line_switches>` has the same effect.
+
+Using an external transpiler: __pragma__ ('xtrans', <translator>, ..., cwd = <workingdirectory>)
+------------------------------------------------------------------------------------------------
+This pragma works the same as *__pragma__ ('js', ...)*, only now an external translator application can be specified, e.g. to translate JSX code.
+If the *cwd* parameter is present, it the external translator will use it as working directory.
+The code offered to this pragma is routed through this external translator by means of pipes.
+This pragma can use *__include__ (...)* just like *__pragma__ ('js', ...)*.
+
+Example:
+
+.. literalinclude:: ../../development/manual_tests/xtrans/test.py
+	:tab-width: 4
+	:caption: Test program using __pragma__ ('xtrans', ...)
+    
+.. literalinclude:: ../../development/manual_tests/xtrans/change_case.cpp
+	:tab-width: 4
+	:caption: Simple external translator change_case.cpp, changing the case to upper or lower, depending on -l switch
+    
+.. literalinclude:: ../../development/manual_tests/xtrans/test_for_docs.js
+	:tab-width: 4
+	:caption: The resulting translated file test.js
+
+Create bare JavaScript objects and iterate over their attributes from Python: __pragma__ ('jsiter') and __pragma__ ('nojsiter')
+-------------------------------------------------------------------------------------------------------------------------------
+Normally a Python *{...}* literal is compiled to *dict ({...})* to include the special attributes and methods of a Python dict, including e.g. an iterator. When *__pragma__ ('jsiter')* is active, a *Python {...}* literal is compiled to a bare *{...}*, without special attributes or methods. To still be able to iterate over the attributes of such a bare JavaScript object from Python, when *__pragma__ ('jsiter')* is active, a Python *for ... in ...* is literally translated to a JavaScript *for (var ... in ...)*. The main use case for this pragma is conveniently looping through class attributes in the *__new__* method of a metaclass. As a more flexible, but less convenient alternative, *__pragma__ ('js', '{}', '''...''')* can be used.
+
+An example of the use of this pragma is the following:
+
+.. literalinclude:: ../../development/automated_tests/transcrypt/metaclasses/__init__.py
+	:start-after: from org.transcrypt.stubs.browser import __pragma__
+	:end-before: class Uppercaser (metaclass = UppercaserMeta):
+	:tab-width: 4
+	:caption: Use of __pragma__ ('jsiter') and __pragma ('nojsiter') to manipulate class attributes in a metaclass

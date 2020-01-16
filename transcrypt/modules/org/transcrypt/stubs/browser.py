@@ -1,15 +1,24 @@
-import builtins
+# This module emulates some browser functionality when running on the desktop using CPython
 
-from org.transcrypt.__base__ import __envir__
+import builtins
+import tokenize
+import os
+
 from org.transcrypt import utils
 
-# Complete __envir__ for the stub mode
+# Get environment from runtime and correct executor to be interpreter
+
+pathOfThisFile = os.path.dirname (os.path.abspath (__file__)) .replace ('\\', '/')
+__envir__ = utils.Any ()
+with tokenize.open (f'{pathOfThisFile}/../__envir__.js') as envirFile:
+    exec (envirFile.read ());
 __envir__.executor_name = __envir__.interpreter_name
 
 # Set main to commandArgs.source rather than transcrypt
 class __main__:
-    __file__ = utils.commandArgs.source
-
+    # Var source is only set if browser module is NOT imported from sphinx conf.py
+    __file__ = utils.commandArgs.source if hasattr (utils.commandArgs, 'source') else 'UNKNOWN'
+        
 # Browser root singleton
 class window:
     class console:
@@ -30,10 +39,6 @@ for attributeName in window.__dict__:
 def print (*args):
     console.log (*args)
 
-# Ignore all pragma's when running CPython, since we can't control CPython's operation in a simple way
-def __pragma__ (*args):
-    pass
-    
 def __new__ (constructedObject):
     return constructedObject
     
@@ -41,4 +46,11 @@ __symbols__ = []
 def __set_stubsymbols__ (symbols):
     global __symbols__
     __symbols__ = symbols
+    
+def __pragma__ (*args):
+    if args [0] == 'defined':
+        for arg in args [1 : ]:
+            if arg in __symbols__:
+                return True
+        return False
     

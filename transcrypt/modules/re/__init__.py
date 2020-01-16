@@ -14,7 +14,6 @@
 from org.transcrypt.stubs.browser import __pragma__
 from re.translate import translate
 
-
 # Flags
 
 T = (1<<0)
@@ -211,7 +210,7 @@ class Match(object):
         if ( self._namedGroups is not None ):
             ret = {}
             for gName, gId in self._namedGroups.items():
-                value = self._obj[gid]
+                value = self._obj[gId]
                 ret[gName] = value if value is not None else default
             return(ret)
         else:
@@ -617,16 +616,9 @@ class Regex(object):
         a list.
         @see the python docs
         """
-        # @note - Transcrypt compiled with `-e 5` does not have
-        #    iterator support at this point. Only `-e 6` has
-        #    iterator support.
-        __pragma__ ('ifdef', '__esv5__')
-        raise NotImplementedError("No Iterator Support in es5")
-        __pragma__('else')
         mlist = self._findAllMatches(string, pos, endpos)
         ret = map(lambda m: Match(m, string, 0, len(string), self, self._groupindex), mlist)
         return( iter(ret) )
-        __pragma__('endif')
 
     def sub(self, repl, string, count = 0):
         """ Substitude each match of this regex in the passed string
@@ -801,7 +793,7 @@ def escape(string):
     __pragma__(
         'js', '{}',
         '''
-        var r = /[^A-Za-z\d]/g;
+        var r = /[^A-Za-z:;\d]/g;
         ret = string.replace(r, replfunc);
         ''')
     if ( ret is not None ):

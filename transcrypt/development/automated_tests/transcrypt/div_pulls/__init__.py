@@ -1,5 +1,7 @@
 # Also contains small enhancements
 
+import div_pulls.pull575_reexport_modules as pull575
+
 'This is a single line docstring'
 class A:
     '''
@@ -42,4 +44,11 @@ def run (autoTester):
     autoTester.check (list (filter (lambda x: x % 2 == 0, range (10))))
     autoTester.check (list (map (lambda x: x*x, range (0, 31, 3))))
     
+    autoTester.check ('Pull 561')
+    def brackets (word):
+        autoTester.check ('sideeffect')
+        return '[' + word + ']'
+    autoTester.check (brackets ('anything') .lower ())   #__:opov
+    
+    pull575.run (autoTester)
     

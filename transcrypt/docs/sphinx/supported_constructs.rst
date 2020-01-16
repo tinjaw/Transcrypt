@@ -32,6 +32,13 @@ Attribute proxies by name: __getattr__, __setattr__
 	:tab-width: 4
 	:caption: Testlet: proxies
 
+Bytes and bytearrays: initial support
+-------------------------------------
+
+.. literalinclude:: ../../development/automated_tests/transcrypt/byte_arrays/__init__.py
+	:tab-width: 4
+	:caption: Testlet: byte_arrays
+
 Callable or not: using the callable () built-in function
 --------------------------------------------------------
 
@@ -69,6 +76,13 @@ Control structures: for...else, while...else, if...elif...else, break, continue
 	:tab-width: 4
 	:caption: Testlet: control_structures
 
+Data classes: Avoiding boilerplate code
+---------------------------------------
+
+.. literalinclude:: ../../development/automated_tests/transcrypt/data_classes/__init__.py
+	:tab-width: 4
+	:caption: Testlet: data_classes
+
 Data structures: tuple, list, dict, set
 ---------------------------------------
 
@@ -79,7 +93,7 @@ Data structures: tuple, list, dict, set
 Decorators: function and class, with and without parameters
 -----------------------------------------------------------
 
-Transcrypt supports decorators on methods and classes. A decorator itself can be a function or an object with an overloaded __call__ operator. Parameterized decorator factories are also supported. Decorators on methods are not supported, except trivially for @classmethod. Methods decorated with @classmethod can be called on an object as demonstrated in the code below, not on a class. All flavours of properties are fully supported, though directly and not through decorator syntax. Extensive use of properties is demonstrated in the :ref:`properties testlet <autotest_properties>`.
+Transcrypt supports decorators on methods and classes. A decorator itself can be a function or an object with an overloaded __call__ operator. Parameterized decorator factories are also supported. All flavours of properties can be used directly or through decorator syntax. Extensive use of properties is demonstrated in the :ref:`properties testlet <autotest_properties>`.
 
 .. literalinclude:: ../../development/automated_tests/transcrypt/decorators/__init__.py
 	:tab-width: 4
@@ -220,6 +234,13 @@ Metaclasses: overriding type.__new__ in a descendant metaclass
 	:tab-width: 4
 	:caption: Testlet: metaclasses
 
+Method and class decorators
+---------------------------
+
+.. literalinclude:: ../../development/automated_tests/transcrypt/method_and_class_decorators/__init__.py
+	:tab-width: 4
+	:caption: Testlet: method_and_class_decorators
+
 Module builtin: a small part of it demo'ed
 ------------------------------------------
 
@@ -233,6 +254,13 @@ Module cmath: allmost all of Python's cmath module
 .. literalinclude:: ../../development/automated_tests/transcrypt/module_cmath/__init__.py
 	:tab-width: 4
 	:caption: Testlet: module_cmath
+
+Module datetime: transcryption of Python's datetime module
+----------------------------------------------------------
+
+.. literalinclude:: ../../development/automated_tests/transcrypt/module_datetime/__init__.py
+	:tab-width: 4
+	:caption: Testlet: module_datetime
 
 Module itertools: allmost all of Python's itertools module
 ----------------------------------------------------------
@@ -254,6 +282,44 @@ Module random: most important functions of Python's random module
 .. literalinclude:: ../../development/manual_tests/module_random/module_random.py
 	:tab-width: 4
 	:caption: Manual_test: module_random
+
+Module re: transcryption of Python's re module
+----------------------------------------------
+
+.. literalinclude:: ../../development/automated_tests/re/autotest.py
+	:tab-width: 4
+	:caption: Testlet: re/autotest
+
+.. literalinclude:: ../../development/automated_tests/re/basictests.py
+	:tab-width: 4
+	:caption: Testlet: re/basictests
+
+.. literalinclude:: ../../development/automated_tests/re/basic_pyre.py
+	:tab-width: 4
+	:caption: Testlet: re/basic_pyre
+
+.. literalinclude:: ../../development/automated_tests/re/basic_jsre.py
+	:tab-width: 4
+	:caption: Testlet: re/basictests
+
+Module time: transcryption of Python's time module
+--------------------------------------------------
+
+.. literalinclude:: ../../development/automated_tests/time/autotest.py
+	:tab-width: 4
+	:caption: Testlet: time/testlet0
+
+.. literalinclude:: ../../development/automated_tests/time/testlet0.py
+	:tab-width: 4
+	:caption: Testlet: time/testlet0
+
+.. literalinclude:: ../../development/automated_tests/time/mult_time.py
+	:tab-width: 4
+	:caption: Testlet: time/mult_time
+
+.. literalinclude:: ../../development/automated_tests/time/strptime.py
+	:tab-width: 4
+	:caption: Testlet: time/strptime
 
 Modules: hierarchical, both local to the project and global url-based
 ---------------------------------------------------------------------
